@@ -4,34 +4,42 @@
   <meta charset="UTF-8">
   <title>GPS en Tiempo Real</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f2f5;
-      padding: 20px;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+
     .gps-data {
-      background: white;
+      text-align: center;
+      font-size: 2rem;
       padding: 20px;
-      border-radius: 10px;
-      max-width: 400px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .gps-data h2 {
-      margin-bottom: 10px;
-    }
+
     .gps-data p {
-      margin: 5px 0;
+      margin: 1rem 0;
+    }
+
+    #error {
+      color: red;
+      font-size: 1.5rem;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
   <div class="gps-data">
-    <h2>Coordenadas GPS en Tiempo Real</h2>
     <p><strong>Latitud:</strong> <span id="latitud">Esperando...</span></p>
     <p><strong>Longitud:</strong> <span id="longitud">Esperando...</span></p>
     <p><strong>Altitud:</strong> <span id="altitud">Esperando...</span></p>
     <p><strong>Precisión:</strong> <span id="precision">Esperando...</span></p>
-    <p id="error" style="color: red;"></p>
+    <p id="error"></p>
   </div>
 
   <script>
@@ -45,7 +53,21 @@
           document.getElementById("error").textContent = "";
         },
         function(error) {
-          document.getElementById("error").textContent = "Error obteniendo ubicación: " + error.message;
+          let msg = "";
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              msg = "Has denegado el permiso de ubicación. Habilítalo en la configuración del navegador.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              msg = "La información de ubicación no está disponible.";
+              break;
+            case error.TIMEOUT:
+              msg = "La solicitud de ubicación ha caducado.";
+              break;
+            default:
+              msg = "Error desconocido.";
+          }
+          document.getElementById("error").textContent = msg;
         },
         {
           enableHighAccuracy: true,
@@ -54,9 +76,8 @@
         }
       );
     } else {
-      document.getElementById("error").textContent = "Geolocalización no es soportada por este navegador.";
+      document.getElementById("error").textContent = "Tu navegador no soporta geolocalización.";
     }
   </script>
 </body>
 </html>
-
